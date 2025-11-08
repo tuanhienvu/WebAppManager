@@ -2,7 +2,7 @@ import { createMocks } from 'node-mocks-http';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import handler from '../../pages/api/audit-logs/index';
 import handlerId from '../../pages/api/audit-logs/[id]';
-import { LogAction } from '@prisma/client';
+import { LOG_ACTION } from '../../lib/prisma-constants';
 import { createMockPrismaClient } from '../lib/mock-prisma';
 
 jest.mock('../../lib/prisma', () => {
@@ -29,7 +29,7 @@ describe('/api/audit-logs', () => {
         {
           id: '1',
           tokenId: '1',
-          action: LogAction.VALIDATE,
+          action: LOG_ACTION.VALIDATE,
           timestamp: new Date(),
           ipAddress: '127.0.0.1',
           userAgent: 'Test Agent',
@@ -109,7 +109,7 @@ describe('/api/audit-logs', () => {
         method: 'POST',
         body: {
           tokenId: '1',
-          action: LogAction.VALIDATE,
+          action: LOG_ACTION.VALIDATE,
           ipAddress: '127.0.0.1',
           userAgent: 'Test Agent',
         },
@@ -141,7 +141,7 @@ describe('/api/audit-logs', () => {
         method: 'POST',
         body: {
           tokenId: '999',
-          action: LogAction.VALIDATE,
+          action: LOG_ACTION.VALIDATE,
         },
       });
 

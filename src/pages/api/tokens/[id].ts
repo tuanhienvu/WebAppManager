@@ -1,8 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPrismaClient } from '../../../lib/prisma';
-import { TokenStatus, Permission, Prisma } from '@prisma/client';
+import {
+  TOKEN_STATUS_VALUES,
+  PERMISSION_VALUES,
+  type TokenStatusValue,
+  type PermissionValue,
+} from '../../../lib/prisma-constants';
 
-const mapPermissions = (value: Prisma.JsonValue): string[] => {
+type AccessTokenUpdateInput = {
+  token?: string;
+  version?: { connect: { id: string } } | { disconnect: true };
+  expiresAt?: Date;
+  permissions?: PermissionValue[];
+  status?: TokenStatusValue;
+  owner?: string | null;
+  blockchainTxHash?: string | null;
+};
+
+const mapPermissions = (value: unknown): string[] => {
   if (Array.isArray(value)) {
     return value.map((item) => String(item));
   }
@@ -49,7 +64,7 @@ export default async function handler(
         blockchainTxHash,
       } = req.body;
 
-      const updateData: Prisma.AccessTokenUpdateInput = {};
+      const updateData: AccessTokenUpdateInput = {};
       if (token) updateData.token = token;
       if (versionId !== undefined) {
         if (versionId) {
@@ -74,23 +89,21 @@ export default async function handler(
         if (!Array.isArray(permissions)) {
           return res.status(400).json({ error: 'permissions must be an array' });
         }
-        const validPermissions = Object.values(Permission);
         const invalidPermissions = permissions.filter(
-          (p: string) => !validPermissions.includes(p as Permission),
+          (p: string) => !PERMISSION_VALUES.includes(p as PermissionValue),
         );
         if (invalidPermissions.length > 0) {
           return res.status(400).json({
             error: `Invalid permissions: ${invalidPermissions.join(', ')}`,
           });
         }
-        updateData.permissions = permissions as Prisma.InputJsonValue;
+        updateData.permissions = permissions as PermissionValue[];
       }
       if (status) {
-        const validStatuses = Object.values(TokenStatus);
-        if (!validStatuses.includes(status)) {
+        if (!TOKEN_STATUS_VALUES.includes(status)) {
           return res.status(400).json({ error: 'Invalid status' });
         }
-        updateData.status = status;
+        updateData.status = status as TokenStatusValue;
       }
       if (owner !== undefined) updateData.owner = owner;
       if (blockchainTxHash !== undefined)

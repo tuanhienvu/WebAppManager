@@ -1,6 +1,12 @@
-import { PrismaClient, TokenStatus, Permission, LogAction, UserRole } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import '../src/lib/db-config'; // Ensure DATABASE_URL is set from individual variables
 import { hashPassword } from '../src/lib/password';
+import {
+  TOKEN_STATUS,
+  PERMISSION,
+  LOG_ACTION,
+  USER_ROLE,
+} from '../src/lib/prisma-constants';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +27,7 @@ async function main() {
   await prisma.accessToken.deleteMany();
   await prisma.version.deleteMany();
   await prisma.software.deleteMany();
-  await prisma.userPermission.deleteMany();
+  await prisma.userPERMISSION.deleteMany();
   await prisma.settings.deleteMany();
   await prisma.user.deleteMany();
 
@@ -33,7 +39,7 @@ async function main() {
       email: 'vuleitsolution@gmail.com',
       name: 'System Administrator',
       password: adminPasswordHash,
-      role: UserRole.ADMIN,
+      role: USER_ROLE.ADMIN,
       phone: '+84 963 373 213',
       isActive: true,
     },
@@ -48,7 +54,7 @@ async function main() {
       email: 'manager@webappmanager.com',
       name: 'Operations Manager',
       password: managerPasswordHash1,
-      role: UserRole.MANAGER,
+      role: USER_ROLE.MANAGER,
       phone: '+1 (555) 333-3333',
       isActive: true,
       avatar: 'https://i.pravatar.cc/150?img=12',
@@ -64,7 +70,7 @@ async function main() {
       email: 'user@webappmanager.com',
       name: 'QA Specialist',
       password: userPasswordHash1,
-      role: UserRole.USER,
+      role: USER_ROLE.USER,
       phone: '+1 (555) 555-5555',
       isActive: true,
       avatar: 'https://i.pravatar.cc/150?img=32',
@@ -73,26 +79,26 @@ async function main() {
   console.log(`✅ Regular user created: ${regularUser1.email}`);
 
   // Assign user-specific permissions
-  await prisma.userPermission.createMany({
+  await prisma.userPERMISSION.createMany({
     data: [
       {
         userId: adminUser.id,
-        permission: Permission.EXTEND,
+        permission: PERMISSION.EXTEND,
         resource: 'system',
       },
       {
         userId: managerUser1.id,
-        permission: Permission.WRITE,
+        permission: PERMISSION.WRITE,
         resource: 'software',
       },
       {
         userId: managerUser1.id,
-        permission: Permission.WRITE,
+        permission: PERMISSION.WRITE,
         resource: 'tokens',
       },
       {
         userId: regularUser1.id,
-        permission: Permission.READ,
+        permission: PERMISSION.READ,
         resource: 'tokens',
       },
     ],
@@ -250,8 +256,8 @@ async function main() {
       token: generateToken(),
       softwareId: software1.id,
       versionId: version1_3.id,
-      status: TokenStatus.ACTIVE,
-      permissions: [Permission.READ, Permission.WRITE, Permission.SYNC],
+      status: TOKEN_STATUS.ACTIVE,
+      permissions: [PERMISSION.READ, PERMISSION.WRITE, PERMISSION.SYNC],
       owner: regularUser1.email,
       expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
       blockchainTxHash: generateBlockchainHash(),
@@ -263,8 +269,8 @@ async function main() {
       token: generateToken(),
       softwareId: software1.id,
       versionId: version1_2.id,
-      status: TokenStatus.ACTIVE,
-      permissions: [Permission.READ],
+      status: TOKEN_STATUS.ACTIVE,
+      permissions: [PERMISSION.READ],
       owner: adminUser.email,
       expiresAt: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days
     },
@@ -275,8 +281,8 @@ async function main() {
       token: generateToken(),
       softwareId: software2.id,
       versionId: version2_2.id,
-      status: TokenStatus.ACTIVE,
-      permissions: [Permission.READ, Permission.WRITE, Permission.EXCHANGE, Permission.EXTEND],
+      status: TOKEN_STATUS.ACTIVE,
+      permissions: [PERMISSION.READ, PERMISSION.WRITE, PERMISSION.EXCHANGE, PERMISSION.EXTEND],
       owner: managerUser1.email,
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
       blockchainTxHash: generateBlockchainHash(),
@@ -288,8 +294,8 @@ async function main() {
       token: generateToken(),
       softwareId: software2.id,
       versionId: version2_1.id,
-      status: TokenStatus.EXPIRED,
-      permissions: [Permission.READ],
+      status: TOKEN_STATUS.EXPIRED,
+      permissions: [PERMISSION.READ],
       owner: 'qa-team@example.com',
       expiresAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
     },
@@ -300,8 +306,8 @@ async function main() {
       token: generateToken(),
       softwareId: software3.id,
       versionId: version3_1.id,
-      status: TokenStatus.ACTIVE,
-      permissions: [Permission.READ, Permission.SYNC],
+      status: TOKEN_STATUS.ACTIVE,
+      permissions: [PERMISSION.READ, PERMISSION.SYNC],
       owner: 'sync-user@example.com',
       expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
     },
@@ -311,8 +317,8 @@ async function main() {
     data: {
       token: generateToken(),
       softwareId: software1.id,
-      status: TokenStatus.REVOKED,
-      permissions: [Permission.READ, Permission.WRITE],
+      status: TOKEN_STATUS.REVOKED,
+      permissions: [PERMISSION.READ, PERMISSION.WRITE],
       owner: 'legacy-user@example.com',
       expiresAt: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
       blockchainTxHash: generateBlockchainHash(),
@@ -324,8 +330,8 @@ async function main() {
       token: generateToken(),
       softwareId: software4.id,
       versionId: version4_1.id,
-      status: TokenStatus.ACTIVE,
-      permissions: [Permission.READ, Permission.SYNC],
+      status: TOKEN_STATUS.ACTIVE,
+      permissions: [PERMISSION.READ, PERMISSION.SYNC],
       owner: 'beta-tester@example.com',
       expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days
     },
@@ -336,8 +342,8 @@ async function main() {
       token: generateToken(),
       softwareId: software4.id,
       versionId: version4_2.id,
-      status: TokenStatus.EXPIRED,
-      permissions: [Permission.READ],
+      status: TOKEN_STATUS.EXPIRED,
+      permissions: [PERMISSION.READ],
       owner: 'mobile-team@example.com',
       expiresAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
     },
@@ -348,7 +354,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token1.id,
-      action: LogAction.CREATE,
+      action: LOG_ACTION.CREATE,
       ipAddress: '192.168.1.100',
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       blockchainTxHash: generateBlockchainHash(),
@@ -358,7 +364,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token1.id,
-      action: LogAction.VALIDATE,
+      action: LOG_ACTION.VALIDATE,
       ipAddress: '192.168.1.105',
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
     },
@@ -367,7 +373,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token2.id,
-      action: LogAction.CREATE,
+      action: LOG_ACTION.CREATE,
       ipAddress: '10.0.0.50',
       userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
     },
@@ -376,7 +382,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token3.id,
-      action: LogAction.CREATE,
+      action: LOG_ACTION.CREATE,
       ipAddress: '172.16.0.1',
       userAgent: 'curl/7.68.0',
       blockchainTxHash: generateBlockchainHash(),
@@ -386,7 +392,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token3.id,
-      action: LogAction.EXTEND,
+      action: LOG_ACTION.EXTEND,
       ipAddress: '172.16.0.1',
       userAgent: 'PostmanRuntime/7.32.0',
       blockchainTxHash: generateBlockchainHash(),
@@ -396,7 +402,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token4.id,
-      action: LogAction.VALIDATE,
+      action: LOG_ACTION.VALIDATE,
       ipAddress: '192.168.1.200',
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     },
@@ -405,7 +411,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token6.id,
-      action: LogAction.REVOKE,
+      action: LOG_ACTION.REVOKE,
       ipAddress: '10.0.0.1',
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       blockchainTxHash: generateBlockchainHash(),
@@ -415,7 +421,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token1.id,
-      action: LogAction.EXCHANGE,
+      action: LOG_ACTION.EXCHANGE,
       ipAddress: '192.168.1.100',
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       blockchainTxHash: generateBlockchainHash(),
@@ -425,7 +431,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token7.id,
-      action: LogAction.CREATE,
+      action: LOG_ACTION.CREATE,
       ipAddress: '203.0.113.25',
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     },
@@ -434,7 +440,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token7.id,
-      action: LogAction.VALIDATE,
+      action: LOG_ACTION.VALIDATE,
       ipAddress: '203.0.113.25',
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
     },
@@ -443,7 +449,7 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       tokenId: token8.id,
-      action: LogAction.VALIDATE,
+      action: LOG_ACTION.VALIDATE,
       ipAddress: '203.0.113.40',
       userAgent: 'Mozilla/5.0 (Linux; Android 14)',
     },

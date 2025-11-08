@@ -1,7 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPrismaClient } from '../../../lib/prisma';
-import { UserRole } from '@prisma/client';
 import { hashPassword } from '../../../lib/password';
+import {
+  USER_ROLE,
+  USER_ROLE_VALUES,
+} from '../../../lib/prisma-constants';
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,7 +21,9 @@ export default async function handler(
       });
 
       // Remove password from response
-      const safeUsers = users.map(({ password, ...user }) => user);
+      const safeUsers = users.map(
+        ({ password: _password, ...user }: (typeof users)[number]) => user,
+      );
       return res.status(200).json(safeUsers);
     }
 
@@ -32,9 +37,8 @@ export default async function handler(
       }
 
       // Validate role
-      const validRoles = Object.values(UserRole);
-      const userRole = role || UserRole.USER;
-      if (!validRoles.includes(userRole)) {
+      const userRole = (role as (typeof USER_ROLE_VALUES)[number]) ?? USER_ROLE.USER;
+      if (!USER_ROLE_VALUES.includes(userRole)) {
         return res.status(400).json({ error: 'Invalid role' });
       }
 

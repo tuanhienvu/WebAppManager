@@ -1,12 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPrismaClient } from '../../../lib/prisma';
-import { TokenStatus, Permission, Prisma } from '@prisma/client';
+import {
+  TOKEN_STATUS,
+  TOKEN_STATUS_VALUES,
+  PERMISSION,
+  PERMISSION_VALUES,
+} from '../../../lib/prisma-constants';
 
 function generateToken(): string {
   return `token_${Math.random().toString(36).substring(2, 15)}_${Date.now()}`;
 }
 
-function mapPermissions(value: Prisma.JsonValue): string[] {
+function mapPermissions(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value.map((item) => String(item));
   }
@@ -33,13 +38,13 @@ export default async function handler(
       const where: {
         softwareId?: string;
         versionId?: string;
-        status?: TokenStatus;
+        status?: (typeof TOKEN_STATUS_VALUES)[number];
         owner?: string;
         expiresAt?: { lt: Date } | { gte: Date };
       } = {};
       if (softwareId) where.softwareId = softwareId as string;
       if (versionId) where.versionId = versionId as string;
-      if (status) where.status = status as TokenStatus;
+      if (status) where.status = status as (typeof TOKEN_STATUS_VALUES)[number];
       if (owner) where.owner = owner as string;
       if (expired === 'true') {
         where.expiresAt = { lt: new Date() };
@@ -58,7 +63,7 @@ export default async function handler(
         },
       });
 
-      const normalizedTokens = tokens.map((token) => ({
+      const normalizedTokens = tokens.map((token: (typeof tokens)[number]) => ({
         ...token,
         permissions: mapPermissions(token.permissions),
       }));
@@ -110,9 +115,9 @@ export default async function handler(
       }
 
       // Validate status
-      const validStatuses = Object.values(TokenStatus);
-      const tokenStatus = status || TokenStatus.ACTIVE;
-      if (!validStatuses.includes(tokenStatus)) {
+      const tokenStatus =
+        (status as (typeof TOKEN_STATUS_VALUES)[number]) ?? TOKEN_STATUS.ACTIVE;
+      if (!TOKEN_STATUS_VALUES.includes(tokenStatus)) {
         return res.status(400).json({ error: 'Invalid status' });
       }
 
@@ -121,10 +126,9 @@ export default async function handler(
       }
 
       // Validate permissions
-      const validPermissions = Object.values(Permission);
       if (permissions && Array.isArray(permissions)) {
         const invalidPermissions = permissions.filter(
-          (p) => !validPermissions.includes(p),
+          (p) => !PERMISSION_VALUES.includes(p),
         );
         if (invalidPermissions.length > 0) {
           return res.status(400).json({
@@ -141,7 +145,7 @@ export default async function handler(
           softwareId,
           versionId: versionId || null,
           expiresAt: new Date(expiresAt),
-          permissions: sanitizedPermissions as Prisma.InputJsonValue,
+          permissions: sanitizedPermissions,
           status: tokenStatus,
           owner: owner || null,
           blockchainTxHash: blockchainTxHash || null,
