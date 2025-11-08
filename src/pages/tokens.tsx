@@ -4,6 +4,7 @@ import Modal from '@/components/Modal';
 import { IconPlus, IconEdit, IconDelete, IconCheckCircle, IconXCircle } from '@/components/icons';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { withAuth } from '@/lib/auth-session';
 
 interface AccessToken {
   id: string;
@@ -569,4 +570,6 @@ export default function TokensPage() {
     </Layout>
   );
 }
+
+export const getServerSideProps = withAuth();
 

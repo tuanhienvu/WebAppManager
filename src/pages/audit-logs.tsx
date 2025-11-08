@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { IconRefresh, IconFilter, IconClose } from '@/components/icons';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { withAuth } from '@/lib/auth-session';
 
 interface AuditLog {
   id: string;
@@ -378,3 +379,5 @@ export default function AuditLogsPage() {
     </Layout>
   );
 }
+
+export const getServerSideProps = withAuth();

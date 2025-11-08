@@ -13,6 +13,7 @@ import {
 import { CompanySettings } from '@/types/company';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { withAuth } from '@/lib/auth-session';
 
 interface SocialLink {
   platform: string;
@@ -1350,4 +1351,6 @@ export default function SettingsPage() {
     </Layout>
   );
 }
+
+export const getServerSideProps = withAuth();
 
