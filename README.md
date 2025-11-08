@@ -96,7 +96,56 @@ Language strings live in `src/lib/translations.ts`. The UI toggles languages via
 Swagger UI is available at `/api-docs`. It renders from a static OpenAPI spec defined in `src/pages/api-docs.tsx` and covers Software, Versions, Tokens, Settings, and Audit Log endpoints.
 
 ## Deployment
-The app is optimized for Vercel/Next.js hosting:
+The app is optimized for both Vercel and self-managed servers.
+
+### Private Hosting (Node.js)
+1. **Provision server requirements**
+   - Ubuntu 22.04 LTS (or similar)
+   - Node.js 24.11.0 (use `nvm install 24.11.0`)
+   - MySQL 8.x or MariaDB 10.6+ with network access
+
+2. **Prepare environment**
+   ```bash
+   git clone https://github.com/tuanhienvu/WebAppManager.git
+   cd WebAppManager
+   cp README.md README.local.md   # optional personal notes
+   # create a .env file and populate the variables described below
+   npm ci
+   ```
+
+3. **Configure system service (example using PM2)**
+   ```bash
+   npx pm2 start npm --name webapp-manager -- run start
+   npx pm2 save
+   npx pm2 startup systemd
+   ```
+
+4. **Reverse proxy (Nginx snippet)**
+   ```nginx
+   server {
+     listen 80;
+     server_name app.yourdomain.com;
+
+     location / {
+       proxy_pass http://127.0.0.1:3000;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection "upgrade";
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+     }
+   }
+   ```
+
+5. **Update** with new releases
+   ```bash
+   git pull origin main
+   npm ci
+   npm run build
+   pm2 restart webapp-manager
+   ```
+
+### Vercel / Managed Hosting
 ```bash
 npm run build
 npm start
