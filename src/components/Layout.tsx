@@ -308,8 +308,6 @@ export default function Layout({ children }: LayoutProps) {
                           : 'text-slate-300 hover:bg-slate-800 hover:text-cyan-400'
                       }`}
                       title={sidebarCollapsed ? item.name : ''}
-                      target={item.target}
-                      rel={item.rel}
                     >
                       <Icon
                         className={`flex-shrink-0 ${sidebarCollapsed ? 'mx-auto' : 'mr-3'} h-5 w-5 ${

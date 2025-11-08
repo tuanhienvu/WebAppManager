@@ -19,7 +19,14 @@ export default async function handler(
     }
 
     try {
-      const user = JSON.parse(sessionCookie);
+      const session = JSON.parse(sessionCookie);
+
+      if (!session?.expiresAt || session.expiresAt < Date.now()) {
+        return res.status(200).json({ authenticated: false, user: null });
+      }
+
+      const { expiresAt, ...user } = session;
+
       return res.status(200).json({ authenticated: true, user });
     } catch {
       return res.status(200).json({ authenticated: false, user: null });
