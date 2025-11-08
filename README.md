@@ -1,63 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+<div align="center">
+  <img src="./public/Logo.jpg" alt="WebApp Manager Logo" width="120" />
+  <h1>WebApp Manager</h1>
+  <p>Dashboard for managing software releases, access tokens, audit logs, and company settings.</p>
+</div>
+
+## Table of Contents
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Environment Setup](#environment-setup)
+- [Database & Seeding](#database--seeding)
+- [Running the App](#running-the-app)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Internationalization](#internationalization)
+- [API Documentation](#api-documentation)
+- [Deployment](#deployment)
+
+## Overview
+WebApp Manager is a role-based admin portal built with Next.js. It helps teams track software assets, release versions, manage API access tokens, and audit important actions. The interface includes:
+- Software inventory dashboard
+- Version history management
+- Token issuance and validation workflows
+- Admin audit logs
+- Company profile and contact settings
+- Multilingual UI (English & Vietnamese)
+
+## Tech Stack
+- **Framework:** Next.js 16 / React 19
+- **Styling:** Tailwind CSS 4
+- **Language:** TypeScript
+- **Database ORM:** Prisma 6 (MySQL)
+- **Auth & Security:** Bcrypt password hashing, token-based auth
+- **Testing:** Jest + Testing Library
+- **Docs:** Swagger UI for API reference
 
 ## Prerequisites
-
-- Node.js **24.11.0** (see `.nvmrc` for quick switching)
+- Node.js **24.11.0** (see `.nvmrc`)
 - npm **>= 10.8**
-- MySQL or MariaDB instance for the application database
+- MySQL 8.x or MariaDB 10.6+
 
-## Database Setup (MySQL)
-
-This project now targets MySQL using Prisma. Configure your environment by adding the following to a local `.env` file (update the credentials or host as needed):
-
+## Environment Setup
+Create a local `.env` (not committed by default):
 ```env
-DATABASE_URL="mysql://vul19326_wamadmin:Wamdmin%402025@localhost:3306/vul19326_wam"
-# Optional fallback database
-# DATABASE_URL_FALLBACK="mysql://backup_user:backup%40pass@backup-host:3306/backup_db"
+DATABASE_URL="mysql://username:password@localhost:3306/webapp_manager"
+# Optional additional secrets (JWT keys, SMTP, etc.)
 ```
 
-After setting the variables, apply the schema and seed data:
-
+## Database & Seeding
+Run migrations and populate seed data:
 ```bash
-npx prisma migrate reset
+npx prisma migrate deploy
 npm run seed
 ```
 
-## Getting Started
+> To inspect or adjust the seed data, edit `prisma/seed.ts`.
 
-First, run the development server:
-
+## Running the App
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Visit http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Use `npm run build && npm start` for a production build.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Testing
+- `npm run test` – run the Jest suite once
+- `npm run test:watch` – watch mode
+- `npm run test:coverage` – generate coverage report
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+API routes rely on mocked Prisma clients in `src/__tests__/lib/mock-prisma.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## Project Structure
+```
+src/
+  components/        Shared UI components (layout, modals, icons)
+  contexts/          Language context for i18n
+  hooks/             Auth + role helpers
+  lib/               Prisma client, DB config, password utilities
+  pages/
+    api/             REST endpoints (Next.js API routes)
+    *.tsx            Initial pages (dashboard, tokens, settings, etc.)
+  styles/            Global Tailwind styles
+prisma/
+  schema.prisma      Database schema
+  migrations/        Generated migration files
+  seed.ts            Seed script
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Internationalization
+Language strings live in `src/lib/translations.ts`. The UI toggles languages via the `LanguageSwitcher` component and persists preference using context.
 
-## Learn More
+## API Documentation
+Swagger UI is available at `/api-docs`. It renders from a static OpenAPI spec defined in `src/pages/api-docs.tsx` and covers Software, Versions, Tokens, Settings, and Audit Log endpoints.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
+The app is optimized for Vercel/Next.js hosting:
+```bash
+npm run build
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Ensure environment variables and database credentials are configured in your hosting platform prior to deployment.
