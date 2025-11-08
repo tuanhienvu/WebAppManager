@@ -4,7 +4,6 @@ import Modal from '@/components/Modal';
 import { IconPlus, IconEdit, IconDelete, IconExclamation } from '@/components/icons';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { withAuth } from '@/lib/auth-session';
 
 interface Version {
   id: string;
@@ -370,5 +369,3 @@ export default function VersionsPage() {
     </Layout>
   );
 }
-
-export const getServerSideProps = withAuth();

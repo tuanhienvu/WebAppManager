@@ -5,7 +5,6 @@ import Modal from '@/components/Modal';
 import { IconPlus, IconEdit, IconDelete, IconExclamation } from '@/components/icons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { withAuth } from '@/lib/auth-session';
 
 interface Software {
   id: string;
@@ -357,5 +356,3 @@ export default function SoftwarePage() {
     </Layout>
   );
 }
-
-export const getServerSideProps = withAuth();
