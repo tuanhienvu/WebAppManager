@@ -96,7 +96,8 @@ Language strings live in `src/lib/translations.ts`. The UI toggles languages via
 Swagger UI is available at `/api-docs`. It renders from a static OpenAPI spec defined in `src/pages/api-docs.tsx` and covers Software, Versions, Tokens, Settings, and Audit Log endpoints.
 
 ## Deployment
-The app is optimized for both Vercel and self-managed servers.
+The app is optimized for both Vercel and self-managed servers.  
+For a detailed walkthrough, see [`DEPLOYMENT.md`](./DEPLOYMENT.md).
 
 ### Private Hosting (Node.js)
 1. **Provision server requirements**
