@@ -22,7 +22,10 @@ export default async function handler(
 
       // Convert array to object for easier frontend access
       const settingsObj = settings.reduce(
-        (acc, setting) => {
+        (
+          acc: Record<string, string | null>,
+          setting: (typeof settings)[number],
+        ) => {
           acc[setting.key] = setting.value;
           return acc;
         },

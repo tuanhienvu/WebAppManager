@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPrismaClient } from '../../../../lib/prisma';
-import { LogAction, Prisma } from '@prisma/client';
+import { LOG_ACTION } from '../../../../lib/prisma-constants';
 
-const mapPermissions = (value: Prisma.JsonValue): string[] => {
+const mapPermissions = (value: unknown): string[] => {
   if (Array.isArray(value)) {
     return value.map((item) => String(item));
   }
@@ -54,7 +54,7 @@ export default async function handler(
       await prisma.auditLog.create({
         data: {
           tokenId: tokenRecord.id,
-          action: LogAction.VALIDATE,
+          action: LOG_ACTION.VALIDATE,
           ipAddress,
           userAgent,
         },
@@ -75,7 +75,7 @@ export default async function handler(
       await prisma.auditLog.create({
         data: {
           tokenId: tokenRecord.id,
-          action: LogAction.VALIDATE,
+          action: LOG_ACTION.VALIDATE,
           ipAddress,
           userAgent,
         },
@@ -94,7 +94,7 @@ export default async function handler(
     await prisma.auditLog.create({
       data: {
         tokenId: tokenRecord.id,
-        action: LogAction.VALIDATE,
+        action: LOG_ACTION.VALIDATE,
         ipAddress,
         userAgent,
       },

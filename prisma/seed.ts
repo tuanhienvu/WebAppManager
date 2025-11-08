@@ -1,6 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import '../src/lib/db-config'; // Ensure DATABASE_URL is set from individual variables
 import { hashPassword } from '../src/lib/password';
+import {
+  TOKEN_STATUS,
+  PERMISSION,
+  LOG_ACTION,
+  USER_ROLE,
+} from '../src/lib/prisma-constants';
 
 const prisma = new PrismaClient();
 const TOKEN_STATUS = {
@@ -45,7 +51,7 @@ async function main() {
   await prisma.accessToken.deleteMany();
   await prisma.version.deleteMany();
   await prisma.software.deleteMany();
-  await prisma.userPermission.deleteMany();
+  await prisma.userPERMISSION.deleteMany();
   await prisma.settings.deleteMany();
   await prisma.user.deleteMany();
 
@@ -97,7 +103,7 @@ async function main() {
   console.log(`✅ Regular user created: ${regularUser1.email}`);
 
   // Assign user-specific permissions
-  await prisma.userPermission.createMany({
+  await prisma.userPERMISSION.createMany({
     data: [
       {
         userId: adminUser.id,

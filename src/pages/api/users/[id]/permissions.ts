@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPrismaClient } from '../../../../lib/prisma';
-import { Permission } from '@prisma/client';
+import {
+  PERMISSION_VALUES,
+  type PermissionValue,
+} from '../../../../lib/prisma-constants';
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,14 +29,14 @@ export default async function handler(
         return res.status(400).json({ error: 'permission is required' });
       }
 
-      if (!Object.values(Permission).includes(permission as Permission)) {
+      if (!PERMISSION_VALUES.includes(permission)) {
         return res.status(400).json({ error: 'Invalid permission value' });
       }
 
       const userPermission = await prisma.userPermission.create({
         data: {
           userId: id as string,
-          permission: permission as Permission,
+          permission: permission as PermissionValue,
           resource: resource || null,
         },
       });
@@ -50,7 +53,7 @@ export default async function handler(
 
       const invalidPermissions = permissions.filter(
         (p: { permission: string; resource?: string }) =>
-          !Object.values(Permission).includes(p.permission as Permission),
+          !PERMISSION_VALUES.includes(p.permission as PermissionValue),
       );
 
       if (invalidPermissions.length > 0) {
@@ -67,7 +70,7 @@ export default async function handler(
         await prisma.userPermission.createMany({
           data: permissions.map((p: { permission: string; resource?: string }) => ({
             userId: id as string,
-            permission: p.permission as Permission,
+            permission: p.permission as PermissionValue,
             resource: p.resource || null,
           })),
         });

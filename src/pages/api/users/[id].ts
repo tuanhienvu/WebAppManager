@@ -1,7 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPrismaClient } from '../../../lib/prisma';
-import { UserRole } from '@prisma/client';
 import { hashPassword } from '../../../lib/password';
+import {
+  USER_ROLE_VALUES,
+  type UserRoleValue,
+} from '../../../lib/prisma-constants';
 
 export default async function handler(
   req: NextApiRequest,
@@ -33,7 +36,7 @@ export default async function handler(
       const updateData: {
         name?: string;
         email?: string;
-        role?: UserRole;
+        role?: UserRoleValue;
         phone?: string | null;
         avatar?: string | null;
         password?: string;
@@ -43,11 +46,10 @@ export default async function handler(
       if (name) updateData.name = name;
       if (email) updateData.email = email;
       if (role) {
-        const validRoles = Object.values(UserRole);
-        if (!validRoles.includes(role)) {
+        if (!USER_ROLE_VALUES.includes(role)) {
           return res.status(400).json({ error: 'Invalid role' });
         }
-        updateData.role = role;
+        updateData.role = role as UserRoleValue;
       }
       if (phone !== undefined) updateData.phone = phone || null;
       if (avatar !== undefined) updateData.avatar = avatar || null;

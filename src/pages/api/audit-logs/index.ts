@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPrismaClient } from '../../../lib/prisma';
-import { LogAction } from '@prisma/client';
+import {
+  LOG_ACTION,
+  LOG_ACTION_VALUES,
+  type LogActionValue,
+} from '../../../lib/prisma-constants';
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,14 +24,14 @@ export default async function handler(
 
       const where: {
         tokenId?: string;
-        action?: LogAction;
+        action?: LogActionValue;
         timestamp?: {
           gte?: Date;
           lte?: Date;
         };
       } = {};
       if (tokenId) where.tokenId = tokenId as string;
-      if (action) where.action = action as LogAction;
+      if (action) where.action = action as LogActionValue;
 
       if (startDate || endDate) {
         where.timestamp = {};
@@ -76,15 +80,14 @@ export default async function handler(
       }
 
       // Validate action
-      const validActions = Object.values(LogAction);
-      if (!validActions.includes(action)) {
+      if (!LOG_ACTION_VALUES.includes(action)) {
         return res.status(400).json({ error: 'Invalid action' });
       }
 
       const log = await prisma.auditLog.create({
         data: {
           tokenId,
-          action,
+          action: action as LogActionValue,
           ipAddress: ipAddress || null,
           userAgent: userAgent || null,
           blockchainTxHash: blockchainTxHash || null,

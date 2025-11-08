@@ -58,13 +58,20 @@ export default async function handler(
     };
 
     // Set cookie with session data
-    const cookie = serialize('auth-session', JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    });
+    const cookie = serialize(
+      'auth-session',
+      JSON.stringify({
+        ...sessionData,
+        expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+      }),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 5 * 60, // 5 minutes
+        path: '/',
+      },
+    );
 
     res.setHeader('Set-Cookie', cookie);
     return res.status(200).json({

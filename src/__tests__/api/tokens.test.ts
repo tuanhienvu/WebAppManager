@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import handler from '../../pages/api/tokens/index';
 import handlerId from '../../pages/api/tokens/[id]';
 import handlerValidate from '../../pages/api/tokens/validate/[token]';
-import { TokenStatus, Permission } from '@prisma/client';
+import { TOKEN_STATUS, PERMISSION } from '../../lib/prisma-constants';
 import { createMockPrismaClient } from '../lib/mock-prisma';
 
 jest.mock('../../lib/prisma', () => {
@@ -32,8 +32,8 @@ describe('/api/tokens', () => {
           token: 'test-token',
           softwareId: '1',
           versionId: null,
-          status: TokenStatus.ACTIVE,
-          permissions: [Permission.READ],
+          status: TOKEN_STATUS.ACTIVE,
+          permissions: [PERMISSION.READ],
           expiresAt: new Date('2025-12-31'),
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -80,7 +80,7 @@ describe('/api/tokens', () => {
         token: 'generated-token',
         softwareId: '1',
         versionId: null,
-        status: TokenStatus.ACTIVE,
+        status: TOKEN_STATUS.ACTIVE,
         permissions: [],
         expiresAt: new Date('2025-12-31'),
         createdAt: new Date(),
@@ -146,9 +146,9 @@ describe('/api/tokens', () => {
       const mockToken = {
         id: '1',
         token: 'valid-token',
-        status: TokenStatus.ACTIVE,
+        status: TOKEN_STATUS.ACTIVE,
         expiresAt: futureDate,
-        permissions: [Permission.READ],
+        permissions: [PERMISSION.READ],
         software: { id: '1', name: 'Test Software' },
         version: null,
       };
@@ -169,7 +169,7 @@ describe('/api/tokens', () => {
       expect(res._getStatusCode()).toBe(200);
       const data = JSON.parse(res._getData());
       expect(data.valid).toBe(true);
-      expect(data.token.status).toBe(TokenStatus.ACTIVE);
+      expect(data.token.status).toBe(TOKEN_STATUS.ACTIVE);
     });
 
     it('should return 400 if token is expired', async () => {
@@ -179,7 +179,7 @@ describe('/api/tokens', () => {
       const mockToken = {
         id: '1',
         token: 'expired-token',
-        status: TokenStatus.ACTIVE,
+        status: TOKEN_STATUS.ACTIVE,
         expiresAt: pastDate,
         permissions: [],
         software: { id: '1', name: 'Test Software' },

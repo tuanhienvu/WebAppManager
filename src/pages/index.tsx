@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import Modal from '@/components/Modal';
 import { IconPlus, IconEdit, IconDelete, IconExclamation } from '@/components/icons';
@@ -19,7 +20,14 @@ interface Software {
 
 export default function SoftwarePage() {
   const { t } = useLanguage();
-  const { canAddData, canEditData, canDeleteData } = useCurrentUser();
+  const router = useRouter();
+  const {
+    user,
+    loading: userLoading,
+    canAddData,
+    canEditData,
+    canDeleteData,
+  } = useCurrentUser();
   const [software, setSoftware] = useState<Software[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -30,11 +38,7 @@ export default function SoftwarePage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSoftware();
-  }, []);
-
-  const fetchSoftware = async () => {
+  const fetchSoftware = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/software');
@@ -49,7 +53,22 @@ export default function SoftwarePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    if (userLoading) {
+      return;
+    }
+
+    if (!user) {
+      setSoftware([]);
+      setLoading(false);
+      router.push('/login');
+      return;
+    }
+
+    fetchSoftware();
+  }, [userLoading, user, fetchSoftware, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
