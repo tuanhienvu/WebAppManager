@@ -113,12 +113,114 @@
  - Documentation served from `src/pages/api-docs.tsx`, covering Software, Versions, Tokens, Settings, and Audit Log endpoints.
 
  ## Deployment
- The app runs on any Node.js host (e.g., Ubuntu + PM2 + Nginx). High-level steps:
- 1. Provision server with Node 24.x and MySQL.
- 2. Clone repo, set `.env`, install dependencies (`npm ci`).
- 3. Apply migrations & seed (`npx prisma migrate deploy`, `npm run seed`).
- 4. Generate Prisma client (`npx prisma generate`).
- 5. Run `npm run build` and start with `npm start` or PM2.
- 6. Configure reverse proxy (Nginx) and HTTPS.
+You can deploy WebApp Manager on either a self-managed Node.js host or a platform such as Vercel.
 
- Vercel deployment also works—just configure environment variables in the dashboard and let Next.js handle the rest.
+### Self-managed Node.js Hosting (Ubuntu + PM2 + Nginx)
+1. **Provision the server**
+   - Ubuntu 20.04/22.04 LTS (or similar)
+   - Node.js 24.11.0 (install via `nvm`)
+   - npm ≥ 10.8
+   - Git, PM2, and Nginx
+
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   sudo apt install -y build-essential git curl nginx
+
+   # Install nvm + Node 24.11.0
+   curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+   source ~/.nvm/nvm.sh
+   nvm install 24.11.0
+   nvm alias default 24.11.0
+
+   npm install --global pm2
+   ```
+
+2. **Upload the source**
+   - Clone your repository or upload a build artifact.
+   ```bash
+   cd /var/www
+   sudo git clone https://github.com/your-username/webapp-manager.git
+   sudo chown -R deploy:deploy webapp-manager   # replace with your user
+   cd webapp-manager
+   ```
+
+3. **Create `.env`**
+   ```
+   DATABASE_URL="mysql://user:password@db-host:3306/webapp_manager"
+   NEXT_PUBLIC_API_URL="https://yourdomain.com"
+   # or use DB_HOST/DB_USER/DB_PASSWORD variables
+   ```
+
+4. **Install and build**
+   ```bash
+   npm ci
+   npx prisma migrate deploy
+   npm run seed         # optional but loads initial data
+   npx prisma generate
+   npm run build
+   ```
+
+5. **Start the app (app.js entry) or use PM2**
+   ```bash
+   npm start               # runs node app.js
+   ```
+
+   Or keep it running via PM2:
+   ```bash
+   pm2 start app.js --name webapp-manager
+   pm2 save
+   pm2 startup
+   ```
+
+6. **Configure Nginx reverse proxy**
+   Create `/etc/nginx/sites-available/webapp-manager`:
+   ```nginx
+   server {
+     listen 80;
+     server_name yourdomain.com;
+
+     location / {
+       proxy_pass http://127.0.0.1:3000;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection "upgrade";
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+     }
+   }
+   ```
+
+   Enable the site and reload:
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/webapp-manager /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl reload nginx
+   ```
+
+7. **Add HTTPS (Let’s Encrypt)**
+   ```bash
+   sudo apt install -y certbot python3-certbot-nginx
+   sudo certbot --nginx -d yourdomain.com
+   ```
+
+8. **Future updates**
+   ```bash
+   cd /var/www/webapp-manager
+   git pull origin main
+   npm ci
+   npx prisma migrate deploy
+   npm run build
+   pm2 restart webapp-manager
+   ```
+
+### Vercel / Managed Hosting
+1. Push your repo to GitHub/GitLab.
+2. Create a new project in Vercel and import the repo.
+3. Set the environment variables (`DATABASE_URL`, etc.) in Vercel.
+4. Deploy—the build command is `npm run build`, and the output is handled by Next.js automatically.
+
+### Verification Checklist
+- `https://yourdomain.com` loads the dashboard.
+- `/api-docs` serves Swagger documentation.
+- Authentication routes (`/api/auth/login`, `/api/auth/logout`) respond correctly.
+- PM2 logs (`pm2 logs webapp-manager`) show no unresolved errors.
