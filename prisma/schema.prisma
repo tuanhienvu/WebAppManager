@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Software {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  versions    Version[]
+  tokens      AccessToken[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([createdAt])
+}
+
+model Version {
+  id          String        @id @default(uuid())
+  software    Software      @relation(fields: [softwareId], references: [id])
+  softwareId  String
+  version     String
+  releaseDate DateTime
+  changelog   String?
+  tokens      AccessToken[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([softwareId])
+  @@index([releaseDate])
+}
+
+model AccessToken {
+  id               String      @id @default(uuid())
+  token            String      @unique
+  software         Software    @relation(fields: [softwareId], references: [id])
+  softwareId       String
+  version          Version?    @relation(fields: [versionId], references: [id])
+  versionId        String?
+  expiresAt        DateTime
+  permissions      Json        @default("[]")
+  status           TokenStatus
+  owner            String?
+  blockchainTxHash String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([status])
+  @@index([softwareId])
+  @@index([versionId])
+  @@index([expiresAt])
+  @@index([createdAt])
+  @@index([owner])
+}
+
+enum TokenStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum Permission {
+  READ
+  WRITE
+  SYNC
+  EXCHANGE
+  EXTEND
+}
+
+model AuditLog {
+  id               String    @id @default(uuid())
+  tokenId          String
+  action           LogAction
+  timestamp        DateTime  @default(now())
+  ipAddress        String?
+  userAgent        String?
+  blockchainTxHash String?
+
+  @@index([tokenId])
+  @@index([action])
+  @@index([timestamp])
+}
+
+enum LogAction {
+  VALIDATE
+  EXTEND
+  REVOKE
+  EXCHANGE
+  CREATE
+}
+
+model Settings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String?
+  category  String? // 'company', 'contact', 'social', 'general'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+}
+
+model User {
+  id          String           @id @default(uuid())
+  email       String           @unique
+  name        String
+  password    String // Should be hashed in production
+  role        UserRole         @default(USER)
+  avatar      String?
+  phone       String?
+  isActive    Boolean          @default(true)
+  lastLogin   DateTime?
+  permissions UserPermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([role])
+  @@index([isActive])
+}
+
+model UserPermission {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission String // Custom permission string
+  resource   String? // Resource/feature name
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, permission, resource])
+}
