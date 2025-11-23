@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+
+# Database files
+*.db
+*.db-journal
+
+# Logs
+*.log
+
+# Build cache
+*.tsbuildinfo
+.turbo/
+
+# Coverage
+coverage/
+

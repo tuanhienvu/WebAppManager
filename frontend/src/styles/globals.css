@@ -1,0 +1,154 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Allow selection in input fields */
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+}
+
+@layer utilities {
+  .font-zcool {
+    font-family: 'ZCOOL XiaoWei', serif;
+  }
+}
+
+@layer components {
+  /* Notus Button Styles */
+  .btn-notus-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white transition-all duration-150 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+    background: linear-gradient(to right, #2563eb, #3b82f6);
+  }
+  
+  .btn-notus-primary:hover {
+    background: linear-gradient(to right, #1d4ed8, #2563eb);
+  }
+  
+  .btn-notus-success {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white transition-all duration-150 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+    background: linear-gradient(to right, #16a34a, #22c55e);
+  }
+  
+  .btn-notus-success:hover {
+    background: linear-gradient(to right, #15803d, #16a34a);
+  }
+  
+  .btn-notus-warning {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white transition-all duration-150 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500;
+    background: linear-gradient(to right, #ea580c, #f97316);
+  }
+  
+  .btn-notus-warning:hover {
+    background: linear-gradient(to right, #c2410c, #ea580c);
+  }
+  
+  .btn-notus-danger {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white transition-all duration-150 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500;
+    background: linear-gradient(to right, #dc2626, #ef4444);
+  }
+  
+  .btn-notus-danger:hover {
+    background: linear-gradient(to right, #b91c1c, #dc2626);
+  }
+  
+  .btn-notus-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white transition-all duration-150 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500;
+    background: linear-gradient(to right, #9333ea, #a855f7);
+  }
+  
+  .btn-notus-secondary:hover {
+    background: linear-gradient(to right, #7e22ce, #9333ea);
+  }
+
+  /* Notus Card Styles */
+  .card-notus {
+    @apply relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-xl;
+  }
+  
+  .card-notus-header {
+    @apply rounded-t-xl mb-0 px-6 py-4 border-b border-gray-200 bg-transparent;
+  }
+
+  /* Notus Input Styles */
+  .input-notus {
+    @apply w-full px-3 py-2 text-sm placeholder-gray-400 text-gray-700 bg-white border border-gray-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500;
+    @apply transition-all duration-150;
+  }
+
+  /* Notus Table Styles */
+  .table-notus {
+    @apply w-full mb-0 align-top border-collapse;
+  }
+  
+  .table-notus thead {
+    @apply bg-gray-50;
+  }
+  
+  .table-notus thead th {
+    @apply px-6 py-3 text-xs font-bold text-gray-600 uppercase align-middle border-l-0 border-r-0 whitespace-nowrap;
+  }
+  
+  .table-notus tbody tr {
+    @apply border-b border-gray-200 hover:bg-gray-50 transition-colors;
+  }
+  
+  .table-notus tbody td {
+    @apply px-6 py-4 align-middle border-l-0 border-r-0 text-sm text-gray-800;
+  }
+
+  /* Notus Badge Styles */
+  .badge-notus-primary {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+  }
+  
+  .badge-notus-success {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800;
+  }
+  
+  .badge-notus-warning {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800;
+  }
+  
+  .badge-notus-danger {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800;
+  }
+  
+  .badge-notus-info {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+  }
+
+  /* Notus Alert Styles */
+  .alert-notus-success {
+    @apply relative px-4 py-3 text-sm border border-t-4 rounded-lg mb-4 bg-green-50 border-green-500 text-green-800;
+  }
+  
+  .alert-notus-error {
+    @apply relative px-4 py-3 text-sm border border-t-4 rounded-lg mb-4 bg-red-50 border-red-500 text-red-800;
+  }
+}

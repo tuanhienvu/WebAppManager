@@ -1,374 +1,267 @@
-<<<<<<< HEAD
- <div align="center">
-   <img src="./public/Logo.jpg" alt="WebApp Manager Logo" width="120" />
-   <h1>WebApp Manager</h1>
-   <p>Dashboard for managing software releases, access tokens, audit logs, and company settings.</p>
- </div>
+# WebApp Manager
 
- ## Table of Contents
- - [Overview](#overview)
- - [Tech Stack](#tech-stack)
- - [Prerequisites](#prerequisites)
- - [Environment Setup](#environment-setup)
- - [Database & Seeding](#database--seeding)
- - [Running the App](#running-the-app)
- - [Testing](#testing)
- - [Project Structure](#project-structure)
- - [Internationalization](#internationalization)
- - [API Documentation](#api-documentation)
- - [Deployment](#deployment)
+A full-stack web application for managing software versions, access tokens, and user permissions with role-based access control.
 
- ## Overview
- WebApp Manager is a role-based admin portal built with Next.js. It helps teams track software assets, release versions, manage API access tokens, and audit important actions. The interface includes:
- - Software inventory dashboard
- - Version history management
- - Token issuance and validation workflows
- - Admin audit logs
- - Company profile and contact settings
- - Multilingual UI (English & Vietnamese)
+## 🏗️ Architecture
 
- ## Tech Stack
- - **Framework:** Next.js 16 / React 19
- - **Styling:** Tailwind CSS 4
- - **Language:** TypeScript
- - **Database ORM:** Prisma 6 (MySQL / MariaDB)
- - **Auth & Security:** Bcrypt password hashing, cookie-based sessions
- - **Testing:** Jest + Testing Library
- - **Docs:** Swagger UI for API reference
+This is a **split frontend/backend** application:
 
- ## Prerequisites
- - Node.js **24.11.0** (see `.nvmrc`)
- - npm **>= 10.8**
- - MySQL 8.x or MariaDB 10.6+
+- **Backend:** Express.js REST API (Port 5000)
+- **Frontend:** Next.js React Application (Port 3000)
+- **Database:** SQLite (Development) / MySQL (Production)
 
- ## Environment Setup
- Create a local `.env` (not committed by default):
- ```env
- DATABASE_URL="mysql://username:password@localhost:3306/webapp_manager"
- NEXT_PUBLIC_API_URL="http://localhost:3000"
- # Optional fallback DB
- # DATABASE_URL_FALLBACK="mysql://user:pass@replica-host:3306/webapp_manager"
- ```
+```
+webapp-manager/
+├── backend/          # Express.js API Server
+├── frontend/         # Next.js React App
+└── package.json      # Monorepo scripts
+```
 
- If you prefer to store individual pieces, the app also honors:
- ```
- DB_HOST=localhost
- DB_PORT=3306
- DB_NAME=webapp_manager
- DB_USER=username
- DB_PASSWORD=password
- ```
+## ⚡ Quick Start
 
- ## Database & Seeding
- ```bash
- npx prisma migrate deploy
- npm run seed
- npx prisma generate
- ```
+### Prerequisites
 
- > The seed script (`prisma/seed.ts`) populates default users, company settings, software/version/token samples, and audit logs.
+- Node.js >= 20.19.5
+- npm >= 10.8.0
 
- ## Running the App
- ```bash
- npm install
- npm run dev
- # Visit http://localhost:3000
- ```
+### Installation & Setup
 
- For production:
- ```bash
- npm run build
- npm start
- ```
+```bash
+# 1. Install all dependencies
+npm run install:all
 
- ## Testing
- - `npm run test` – run Jest once
- - `npm run test:watch` – Jest in watch mode
- - `npm run test:coverage` – coverage report
+# 2. Configure backend environment
+# Edit backend/.env with your database credentials
+cp backend/.env.example backend/.env
 
- Mock Prisma clients for tests live in `src/__tests__/lib/mock-prisma.ts`.
+# 3. Run database migrations
+cd backend
+npx prisma migrate dev
+npm run seed
 
- ## Project Structure
- ```
- src/
-   components/        Shared UI (layout, modals, icons)
-   contexts/          Language context for i18n
-   hooks/             Auth + role helpers
-   lib/               Prisma client helper, DB config, password utilities
-   pages/
-     api/             REST endpoints (Next.js API routes)
-     *.tsx            Dashboard pages (software, tokens, versions, settings)
-   styles/            Global Tailwind styles
- prisma/
-   schema.prisma      Database schema
-   migrations/        Generated migration files
-   seed.ts            Seed script
- ```
+# 4. Start development servers
+cd ..
+npm run dev
+```
 
- ## Internationalization
- - Translation strings live in `src/lib/translations.ts`.
- - `LanguageSwitcher` + `LanguageContext` provide runtime language toggling (English/Vietnamese).
+**Access the application:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
 
- ## API Documentation
- - Swagger UI available at `/api-docs`.
- - Documentation served from `src/pages/api-docs.tsx`, covering Software, Versions, Tokens, Settings, and Audit Log endpoints.
+### Default Login
 
- ## Deployment
-You can deploy WebApp Manager on either a self-managed Node.js host or a platform such as Vercel.
+After seeding:
+- **Email:** `vuleitsolution@gmail.com`
+- **Password:** `@5801507746#VULEITS`
 
-### Self-managed Node.js Hosting (Ubuntu + PM2 + Nginx)
-1. **Provision the server**
-   - Ubuntu 20.04/22.04 LTS (or similar)
-   - Node.js 24.11.0 (install via `nvm`)
-   - npm ≥ 10.8
-   - Git, PM2, and Nginx
+## 📜 Available Scripts
 
-   ```bash
-   sudo apt update && sudo apt upgrade -y
-   sudo apt install -y build-essential git curl nginx
+### Development
+```bash
+npm run dev              # Start both servers
+npm run dev:backend      # Start backend only
+npm run dev:frontend     # Start frontend only
+```
 
-   # Install nvm + Node 24.11.0
-   curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
-   source ~/.nvm/nvm.sh
-   nvm install 24.11.0
-   nvm alias default 24.11.0
+### Build
+```bash
+npm run build            # Build both projects
+npm run build:backend    # Build backend only
+npm run build:frontend   # Build frontend only
+```
 
-   npm install --global pm2
-   ```
+### Production
+```bash
+npm start                # Start both servers (production)
+npm run start:backend    # Start backend only
+npm run start:frontend   # Start frontend only
+```
 
-2. **Upload the source**
-   - Clone your repository or upload a build artifact.
-   ```bash
-   cd /var/www
-   sudo git clone https://github.com/your-username/webapp-manager.git
-   sudo chown -R deploy:deploy webapp-manager   # replace with your user
-   cd webapp-manager
-   ```
+### Maintenance
+```bash
+npm run install:all      # Install all dependencies
+npm run clean            # Clean all build artifacts
+```
 
-3. **Create `.env`**
-   ```
-   DATABASE_URL="mysql://user:password@db-host:3306/webapp_manager"
-   NEXT_PUBLIC_API_URL="https://yourdomain.com"
-   # or use DB_HOST/DB_USER/DB_PASSWORD variables
-   ```
+## 🎯 Features
 
-4. **Install and build**
-   ```bash
-   npm ci
-   npx prisma migrate deploy
-   npm run seed         # optional but loads initial data
-   npx prisma generate
-   npm run build
-   ```
+### Core Functionality
+- ✅ Software catalog management
+- ✅ Version tracking and management
+- ✅ Access token generation and validation
+- ✅ Audit logging for security
+- ✅ User management with role-based access
+- ✅ Settings and configuration management
+- ✅ File upload support
+- ✅ Multi-language support (EN/VI)
 
-5. **Start the app (app.js entry) or use PM2**
-   ```bash
-   npm start               # runs node app.js
-   ```
+### Security
+- 🔐 Cookie-based authentication
+- 🔐 Password hashing (bcrypt)
+- 🔐 Role-based permissions (Admin, Manager, User)
+- 🔐 CORS protection
+- 🔐 Session management
 
-   Or keep it running via PM2:
-   ```bash
-   pm2 start app.js --name webapp-manager
-   pm2 save
-   pm2 startup
-   ```
+## 🛠️ Tech Stack
 
-6. **Configure Nginx reverse proxy**
-   Create `/etc/nginx/sites-available/webapp-manager`:
-   ```nginx
-   server {
-     listen 80;
-     server_name yourdomain.com;
+### Backend
+- **Runtime:** Node.js 20+
+- **Framework:** Express.js
+- **Database:** Prisma ORM (SQLite/MySQL)
+- **Auth:** bcryptjs, cookie-based sessions
+- **Language:** TypeScript
 
-=======
-<div align="center">
-  <img src="./public/Logo.jpg" alt="WebApp Manager Logo" width="120" />
-  <h1>WebApp Manager</h1>
-  <p>Dashboard for managing software releases, access tokens, audit logs, and company settings.</p>
-</div>
-
-## Table of Contents
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Environment Setup](#environment-setup)
-- [Database & Seeding](#database--seeding)
-- [Running the App](#running-the-app)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Internationalization](#internationalization)
-- [API Documentation](#api-documentation)
-- [Deployment](#deployment)
-
-## Overview
-WebApp Manager is a role-based admin portal built with Next.js. It helps teams track software assets, release versions, manage API access tokens, and audit important actions. The interface includes:
-- Software inventory dashboard
-- Version history management
-- Token issuance and validation workflows
-- Admin audit logs
-- Company profile and contact settings
-- Multilingual UI (English & Vietnamese)
-
-## Tech Stack
-- **Framework:** Next.js 16 / React 19
+### Frontend
+- **Framework:** Next.js 16
+- **UI:** React 19
 - **Styling:** Tailwind CSS 4
 - **Language:** TypeScript
-- **Database ORM:** Prisma 6 (MySQL)
-- **Auth & Security:** Bcrypt password hashing, token-based auth
-- **Testing:** Jest + Testing Library
-- **Docs:** Swagger UI for API reference
+- **Icons:** React Icons
 
-## Prerequisites
-- Node.js **24.11.0** (see `.nvmrc`)
-- npm **>= 10.8**
-- MySQL 8.x or MariaDB 10.6+
+## 📁 Project Structure
 
-## Environment Setup
-Create a local `.env` (not committed by default):
+### Backend (`backend/`)
+```
+backend/
+├── src/
+│   ├── routes/        # API endpoints
+│   ├── lib/           # Utilities (auth, database, etc.)
+│   ├── middleware/    # Express middleware
+│   ├── types/         # TypeScript types
+│   └── server.ts      # Main server file
+├── prisma/
+│   ├── schema.prisma  # Database schema
+│   ├── migrations/    # Database migrations
+│   └── seed.ts        # Database seeder
+└── uploads/           # Uploaded files
+```
+
+### Frontend (`frontend/`)
+```
+frontend/
+├── src/
+│   ├── pages/         # Next.js pages
+│   ├── components/    # React components
+│   ├── contexts/      # React contexts
+│   ├── hooks/         # Custom hooks
+│   ├── lib/           # Utilities
+│   └── styles/        # CSS styles
+└── public/            # Static assets
+```
+
+## 🔧 Configuration
+
+### Backend Environment (`backend/.env`)
 ```env
-DATABASE_URL="mysql://username:password@localhost:3306/webapp_manager"
-# Optional additional secrets (JWT keys, SMTP, etc.)
+PORT=5000
+NODE_ENV=development
+DATABASE_URL="file:./dev.db"
+FRONTEND_URL=http://localhost:3000
 ```
 
-## Database & Seeding
-Run migrations and populate seed data:
+### Frontend Environment (`frontend/.env.local`)
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
+```
+
+## 🚀 Deployment
+
+### Backend Deployment
 ```bash
-npx prisma migrate deploy
-npm run seed
-```
-
-> To inspect or adjust the seed data, edit `prisma/seed.ts`.
-
-## Running the App
-```bash
-npm install
-npm run dev
-# Visit http://localhost:3000
-```
-
-Use `npm run build && npm start` for a production build.
-
-## Testing
-- `npm run test` – run the Jest suite once
-- `npm run test:watch` – watch mode
-- `npm run test:coverage` – generate coverage report
-
-API routes rely on mocked Prisma clients in `src/__tests__/lib/mock-prisma.ts`.
-
-## Project Structure
-```
-src/
-  components/        Shared UI components (layout, modals, icons)
-  contexts/          Language context for i18n
-  hooks/             Auth + role helpers
-  lib/               Prisma client, DB config, password utilities
-  pages/
-    api/             REST endpoints (Next.js API routes)
-    *.tsx            Initial pages (dashboard, tokens, settings, etc.)
-  styles/            Global Tailwind styles
-prisma/
-  schema.prisma      Database schema
-  migrations/        Generated migration files
-  seed.ts            Seed script
-```
-
-## Internationalization
-Language strings live in `src/lib/translations.ts`. The UI toggles languages via the `LanguageSwitcher` component and persists preference using context.
-
-## API Documentation
-Swagger UI is available at `/api-docs`. It renders from a static OpenAPI spec defined in `src/pages/api-docs.tsx` and covers Software, Versions, Tokens, Settings, and Audit Log endpoints.
-
-## Deployment
-The app is optimized for both Vercel and self-managed servers.  
-For a detailed walkthrough, see [`DEPLOYMENT.md`](./DEPLOYMENT.md).
-
-### Private Hosting (Node.js)
-1. **Provision server requirements**
-   - Ubuntu 22.04 LTS (or similar)
-   - Node.js 24.11.0 (use `nvm install 24.11.0`)
-   - MySQL 8.x or MariaDB 10.6+ with network access
-
-2. **Prepare environment**
-   ```bash
-   git clone https://github.com/tuanhienvu/WebAppManager.git
-   cd WebAppManager
-   cp README.md README.local.md   # optional personal notes
-   # create a .env file and populate the variables described below
-   npm ci
-   ```
-
-3. **Configure system service (example using PM2)**
-   ```bash
-   npx pm2 start npm --name webapp-manager -- run start
-   npx pm2 save
-   npx pm2 startup systemd
-   ```
-
-4. **Reverse proxy (Nginx snippet)**
-   ```nginx
-   server {
-     listen 80;
-     server_name app.yourdomain.com;
-
->>>>>>> 9d070f4489f3e7e0795e7cd28866a0af5741931f
-     location / {
-       proxy_pass http://127.0.0.1:3000;
-       proxy_http_version 1.1;
-       proxy_set_header Upgrade $http_upgrade;
-       proxy_set_header Connection "upgrade";
-       proxy_set_header Host $host;
-       proxy_cache_bypass $http_upgrade;
-     }
-   }
-   ```
-
-<<<<<<< HEAD
-   Enable the site and reload:
-   ```bash
-   sudo ln -s /etc/nginx/sites-available/webapp-manager /etc/nginx/sites-enabled/
-   sudo nginx -t
-   sudo systemctl reload nginx
-   ```
-
-7. **Add HTTPS (Let’s Encrypt)**
-   ```bash
-   sudo apt install -y certbot python3-certbot-nginx
-   sudo certbot --nginx -d yourdomain.com
-   ```
-
-8. **Future updates**
-   ```bash
-   cd /var/www/webapp-manager
-   git pull origin main
-   npm ci
-   npx prisma migrate deploy
-=======
-5. **Update** with new releases
-   ```bash
-   git pull origin main
-   npm ci
->>>>>>> 9d070f4489f3e7e0795e7cd28866a0af5741931f
-   npm run build
-   pm2 restart webapp-manager
-   ```
-
-### Vercel / Managed Hosting
-<<<<<<< HEAD
-1. Push your repo to GitHub/GitLab.
-2. Create a new project in Vercel and import the repo.
-3. Set the environment variables (`DATABASE_URL`, etc.) in Vercel.
-4. Deploy—the build command is `npm run build`, and the output is handled by Next.js automatically.
-
-### Verification Checklist
-- `https://yourdomain.com` loads the dashboard.
-- `/api-docs` serves Swagger documentation.
-- Authentication routes (`/api/auth/login`, `/api/auth/logout`) respond correctly.
-- PM2 logs (`pm2 logs webapp-manager`) show no unresolved errors.
-=======
-```bash
+cd backend
 npm run build
 npm start
 ```
 
-Ensure environment variables and database credentials are configured in your hosting platform prior to deployment.
->>>>>>> 9d070f4489f3e7e0795e7cd28866a0af5741931f
+Deploy to: Heroku, AWS, DigitalOcean, Railway, Render
+
+### Frontend Deployment
+```bash
+cd frontend
+npm run build
+npm start
+```
+
+Deploy to: Vercel, Netlify, AWS Amplify
+
+### Environment Variables
+Remember to set production environment variables:
+- Backend: `DATABASE_URL`, `FRONTEND_URL`
+- Frontend: `NEXT_PUBLIC_API_BASE_URL`
+
+## 📚 API Documentation
+
+### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user
+
+### Resources
+- `/api/software` - Software CRUD operations
+- `/api/versions` - Version management
+- `/api/tokens` - Token management
+- `/api/users` - User management
+- `/api/settings` - Settings management
+- `/api/audit-logs` - Audit log viewing
+- `/api/roles/:role/permissions` - Role permissions
+- `/api/upload` - File upload
+
+Full API documentation available at: http://localhost:3000/api-docs
+
+## 🗄️ Database Management
+
+### Prisma Commands
+```bash
+cd backend
+
+# View database in GUI
+npx prisma studio
+
+# Create new migration
+npx prisma migrate dev --name migration_name
+
+# Reset database
+npx prisma migrate reset
+
+# Seed database
+npm run seed
+```
+
+## 🧪 Testing
+
+```bash
+cd backend
+npm test                 # Run all tests
+npm run test:watch       # Watch mode
+npm run test:coverage    # With coverage
+```
+
+## 📖 Additional Documentation
+
+- **Backend:** See `backend/README.md`
+- **Frontend:** See `frontend/README.md`
+- **Migration Guide:** See `MIGRATION-GUIDE.md`
+- **Quick Start:** See `QUICK-START.md`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📄 License
+
+Private - All rights reserved
+
+## 🆘 Support
+
+For issues or questions:
+- Check the documentation files
+- Review the code comments
+- Open an issue on the repository
+
+---
+
+**Built with ❤️ using Next.js, Express, and Prisma**

@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+.env.local
+*.log
+uploads/
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
