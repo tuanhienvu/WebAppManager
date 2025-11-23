@@ -48,20 +48,6 @@ npm run dev
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:5000
 
-### Default Login
-
-After seeding:
-- **Email:** `vuleitsolution@gmail.com`
-- **Password:** `@5801507746#VULEITS`
-
-## 📜 Available Scripts
-
-### Development
-```bash
-npm run dev              # Start both servers
-npm run dev:backend      # Start backend only
-npm run dev:frontend     # Start frontend only
-```
 
 ### Build
 ```bash
@@ -94,13 +80,6 @@ npm run clean            # Clean all build artifacts
 - ✅ Settings and configuration management
 - ✅ File upload support
 - ✅ Multi-language support (EN/VI)
-
-### Security
-- 🔐 Cookie-based authentication
-- 🔐 Password hashing (bcrypt)
-- 🔐 Role-based permissions (Admin, Manager, User)
-- 🔐 CORS protection
-- 🔐 Session management
 
 ## 🛠️ Tech Stack
 
@@ -151,18 +130,6 @@ frontend/
 
 ## 🔧 Configuration
 
-### Backend Environment (`backend/.env`)
-```env
-PORT=5000
-NODE_ENV=development
-DATABASE_URL="file:./dev.db"
-FRONTEND_URL=http://localhost:3000
-```
-
-### Frontend Environment (`frontend/.env.local`)
-```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
-```
 
 ## 🚀 Deployment
 
@@ -189,24 +156,6 @@ Remember to set production environment variables:
 - Backend: `DATABASE_URL`, `FRONTEND_URL`
 - Frontend: `NEXT_PUBLIC_API_BASE_URL`
 
-## 📚 API Documentation
-
-### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
-- `GET /api/auth/me` - Get current user
-
-### Resources
-- `/api/software` - Software CRUD operations
-- `/api/versions` - Version management
-- `/api/tokens` - Token management
-- `/api/users` - User management
-- `/api/settings` - Settings management
-- `/api/audit-logs` - Audit log viewing
-- `/api/roles/:role/permissions` - Role permissions
-- `/api/upload` - File upload
-
-Full API documentation available at: http://localhost:3000/api-docs
 
 ## 🗄️ Database Management
 
@@ -226,22 +175,6 @@ npx prisma migrate reset
 # Seed database
 npm run seed
 ```
-
-## 🧪 Testing
-
-```bash
-cd backend
-npm test                 # Run all tests
-npm run test:watch       # Watch mode
-npm run test:coverage    # With coverage
-```
-
-## 📖 Additional Documentation
-
-- **Backend:** See `backend/README.md`
-- **Frontend:** See `frontend/README.md`
-- **Migration Guide:** See `MIGRATION-GUIDE.md`
-- **Quick Start:** See `QUICK-START.md`
 
 ## 🤝 Contributing
 
