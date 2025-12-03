@@ -253,5 +253,48 @@ router.delete('/:id/permissions/:permissionId', async (req, res) => {
   }
 });
 
+// Update user permissions (bulk update)
+router.put('/:id/permissions', async (req, res) => {
+  try {
+    const prisma = await getPrismaClient();
+    const { id } = req.params;
+    const { permissions } = req.body;
+
+    if (!Array.isArray(permissions)) {
+      return res.status(400).json({ error: 'Permissions must be an array' });
+    }
+
+    // Delete all existing permissions for this user
+    await prisma.userPermission.deleteMany({
+      where: { userId: id },
+    });
+
+    // Create new permissions
+    if (permissions.length > 0) {
+      await prisma.userPermission.createMany({
+        data: permissions.map((p: any) => ({
+          userId: id,
+          permission: p.permission,
+          resource: p.resource || null,
+        })),
+      });
+    }
+
+    // Fetch and return the updated permissions
+    const updatedPermissions = await prisma.userPermission.findMany({
+      where: { userId: id },
+      orderBy: [
+        { resource: 'asc' },
+        { permission: 'asc' },
+      ],
+    });
+
+    return res.status(200).json(updatedPermissions);
+  } catch (error) {
+    console.error('Error in user permissions bulk update API:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
 

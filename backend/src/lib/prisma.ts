@@ -47,6 +47,17 @@ async function initClient(): Promise<PrismaClient> {
       try {
         await client.$connect();
         globalForPrisma.prismaDatasource = attempt.label;
+        console.log(`✅ Connected to ${attempt.label} database successfully`);
+        if (attempt.url) {
+          // Extract host and database name from URL for logging (without password)
+          try {
+            const url = new URL(attempt.url.replace(/^mysql:/, 'http:'));
+            const dbName = url.pathname.substring(1); // Remove leading /
+            console.log(`   Database: ${dbName} @ ${url.hostname}:${url.port || '3306'}`);
+          } catch {
+            // If URL parsing fails, just log the label
+          }
+        }
         return client;
       } catch (error) {
         lastError = error;

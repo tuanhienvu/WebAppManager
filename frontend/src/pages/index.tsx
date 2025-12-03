@@ -182,14 +182,14 @@ export default function SoftwarePage() {
     <Layout>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">{t('software.title')}</h2>
               <p className="text-sm text-gray-500 mt-1">{t('software.subtitle')}</p>
             </div>
             {canCreateSoftware && (
               <button
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40"
+                className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40"
                 onClick={() => {
                   resetModal();
                   setShowModal(true);
@@ -219,22 +219,22 @@ export default function SoftwarePage() {
         )}
 
         {/* Table */}
-        <div className="block w-full overflow-x-auto">
+        <div className="w-full table-scroll-container">
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <table className="w-full">
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden min-w-full">
+              <table className="w-full min-w-max">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.name')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.description')}</th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('software.versions')}</th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('software.tokens')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('software.created')}</th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -247,11 +247,6 @@ export default function SoftwarePage() {
                   ) : (
                     software.map((item, index) => (
                       <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{item.description || '-'}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-600">{item._count?.versions || 0}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-600">{item._count?.tokens || 0}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{formatUTCDate(item.createdAt)}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-center">
                           <div className="flex items-center justify-center gap-2">
                             {canUpdateSoftware && (
@@ -277,6 +272,11 @@ export default function SoftwarePage() {
                             )}
                           </div>
                         </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{item.description || '-'}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-600">{item._count?.versions || 0}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-600">{item._count?.tokens || 0}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{formatUTCDate(item.createdAt)}</td>
                       </tr>
                     ))
                   )}
@@ -322,7 +322,7 @@ export default function SoftwarePage() {
               placeholder={t('software.placeholderDescription')}
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               className="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -359,7 +359,7 @@ export default function SoftwarePage() {
               </p>
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               className="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"

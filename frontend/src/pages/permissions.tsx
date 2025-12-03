@@ -241,18 +241,20 @@ const PermissionsPage = () => {
   return (
     <Layout>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200 flex flex-wrap gap-3 items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('permissions.title')}</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {t('permissions.description')}
-            </p>
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{t('permissions.title')}</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {t('permissions.description')}
+              </p>
+            </div>
+            {dirty && (
+              <span className="text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+                {t('permissions.unsavedChanges')}
+              </span>
+            )}
           </div>
-          {dirty && (
-            <span className="text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
-              {t('permissions.unsavedChanges')}
-            </span>
-          )}
         </div>
 
         <div className="p-6 space-y-6">
@@ -276,7 +278,7 @@ const PermissionsPage = () => {
                 ))}
               </select>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 className="btn-notus-secondary"
@@ -333,8 +335,9 @@ const PermissionsPage = () => {
           {selectedRole && matrix && (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">{t('permissions.matrixLegend')}</p>
-              <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-200 rounded-lg">
+              <div className="table-scroll-container">
+                <div className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="min-w-full min-w-max">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -393,7 +396,8 @@ const PermissionsPage = () => {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             </div>
           )}

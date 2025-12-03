@@ -135,21 +135,21 @@ export default function AuditLogsPage() {
     <Layout>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">{t('auditLogs.title')}</h2>
               <p className="text-sm text-gray-500 mt-1">{t('auditLogs.subtitle')}</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
+                className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <IconFilter className="mr-2 h-4 w-4" />
                 {t('auditLogs.filters')}
               </button>
               <button
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-cyan-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-all shadow-md shadow-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/40"
+                className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-cyan-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-all shadow-md shadow-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/40"
                 onClick={fetchLogs}
               >
                 <IconRefresh className="mr-2 h-4 w-4" />
@@ -291,7 +291,7 @@ export default function AuditLogsPage() {
         )}
 
         {/* Table */}
-        <div className="block w-full overflow-x-auto p-6">
+        <div className="w-full table-scroll-container p-6">
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -304,8 +304,8 @@ export default function AuditLogsPage() {
                   <span className="font-semibold">{total}</span> {t('auditLogs.results')}
                 </div>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <table className="w-full">
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden min-w-full">
+                <table className="w-full min-w-max">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('auditLogs.timestamp')}</th>

@@ -13,7 +13,12 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "update:users": "tsx scripts/update-users-only.ts",
+    "fix:passwords": "tsx scripts/fix-user-passwords.ts",
+    "backup": "node scripts/backup-database-prisma.js",
+    "backup:mysqldump": "node scripts/backup-database.js",
+    "export:sql": "node scripts/export-data-to-sql.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

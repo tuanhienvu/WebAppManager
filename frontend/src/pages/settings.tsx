@@ -16,6 +16,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { apiFetch, getUploadUrl } from '@/lib/api-client';
 import MessagePopup from '@/components/MessagePopup';
 import ImageGallery from '@/components/ImageGallery';
+import { PermissionsTab } from '@/components/PermissionsTab';
+import { type UserRoleValue } from '@/lib/prisma-constants';
 
 interface SocialLink {
   platform: string;
@@ -424,7 +426,7 @@ export default function SettingsPage() {
 
     if (canManageUsers) {
       extendedTabs.push({ name: t('settings.users'), id: 3 });
-      extendedTabs.push({ name: t('settings.authorization'), id: 4 });
+      extendedTabs.push({ name: t('settings.permissions'), id: 4 });
     }
 
     return extendedTabs;
@@ -667,7 +669,7 @@ export default function SettingsPage() {
                 />
               </div>
               {!isCompanyContactReadOnly && (
-                <div className="flex justify-end pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
                   <button
                     onClick={handleSaveSettings}
                     disabled={saving}
@@ -738,7 +740,7 @@ export default function SettingsPage() {
                 />
               </div>
               {!isCompanyContactReadOnly && (
-                <div className="flex justify-end pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
                   <button
                     onClick={handleSaveSettings}
                     disabled={saving}
@@ -830,7 +832,7 @@ export default function SettingsPage() {
               )}
 
               {!isReadOnlyUser && (
-                <div className="flex justify-end pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
                   <button
                     onClick={handleSaveSettings}
                     disabled={saving}
@@ -846,7 +848,7 @@ export default function SettingsPage() {
           {/* Users Management */}
           {activeTab === 3 && canManageUsers && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h3 className="text-lg font-semibold text-gray-900">{t('settings.userAccounts')}</h3>
                 {canAddUsers && (
                   <button
@@ -854,7 +856,7 @@ export default function SettingsPage() {
                       resetUserForm();
                       setShowUserModal(true);
                     }}
-                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40"
+                    className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40"
                   >
                     <IconPlus className="mr-2 h-4 w-4" />
                     {t('settings.addUser')}
@@ -862,16 +864,17 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <table className="w-full">
+              <div className="table-scroll-container">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden min-w-full">
+                  <table className="w-full min-w-max">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.name')}</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('settings.email')}</th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('settings.role')}</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('settings.phone')}</th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('settings.status')}</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -884,36 +887,6 @@ export default function SettingsPage() {
                     ) : (
                       users.map((user, index) => (
                         <tr key={user.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <div className="flex items-center">
-                              {user.avatar ? (
-                                <img src={getUploadUrl(user.avatar)} alt={user.name} className="h-8 w-8 rounded-full mr-3" />
-                              ) : (
-                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center mr-3">
-                                  <span className="text-xs font-medium text-white">{user.name.charAt(0).toUpperCase()}</span>
-                                </div>
-                              )}
-                              <span className="text-sm font-medium text-gray-900">{user.name}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{user.email}</td>
-                          <td className="px-4 py-3 whitespace-nowrap text-center">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                              user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                              user.role === 'MANAGER' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {user.role}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{user.phone || '-'}</td>
-                          <td className="px-4 py-3 whitespace-nowrap text-center">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                              user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                            }`}>
-                              {user.isActive ? t('settings.active') : t('settings.inactive')}
-                            </span>
-                          </td>
                           <td className="px-4 py-3 whitespace-nowrap text-center">
                             <div className="flex items-center justify-center gap-2">
                               {/* USER role can only edit their own profile */}
@@ -984,11 +957,42 @@ export default function SettingsPage() {
                               )}
                             </div>
                           </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="flex items-center">
+                              {user.avatar ? (
+                                <img src={getUploadUrl(user.avatar)} alt={user.name} className="h-8 w-8 rounded-full mr-3" />
+                              ) : (
+                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center mr-3">
+                                  <span className="text-xs font-medium text-white">{user.name.charAt(0).toUpperCase()}</span>
+                                </div>
+                              )}
+                              <span className="text-sm font-medium text-gray-900">{user.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{user.email}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-center">
+                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                              user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
+                              user.role === 'MANAGER' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{user.phone || '-'}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-center">
+                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                              user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                              {user.isActive ? t('settings.active') : t('settings.inactive')}
+                            </span>
+                          </td>
                         </tr>
                       ))
                     )}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -1065,100 +1069,17 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* Authorization */}
+          {/* Permissions */}
           {activeTab === 4 && canManageUsers && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.userPermissionsAuthorization')}</h3>
-                <p className="text-sm text-gray-600 mb-6">
-                  {t('settings.manageUserPermissions')}
-                </p>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <h4 className="text-sm font-semibold text-blue-900 mb-2">{t('settings.roleBasedAccessControl')}</h4>
-                  <p className="text-xs text-blue-700 mb-3">
-                    {t('settings.roleBasedAccessControlDescription')}
-                  </p>
-                  <div className="text-xs text-blue-700 space-y-1">
-                    <p><strong>• ADMIN:</strong> {t('settings.adminRoleDescription')}</p>
-                    <p><strong>• MANAGER:</strong> {t('settings.managerRoleDescription')}</p>
-                    <p><strong>• USER:</strong> {t('settings.userRoleDescription')}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">{t('settings.roleDefinitions')}</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-start p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 flex items-center gap-2">
-                          <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">ADMIN</span>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">{t('settings.adminFullAccess')}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 flex items-center gap-2">
-                          <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">MANAGER</span>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">{t('settings.managerLimitedAccess')}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 flex items-center gap-2">
-                          <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">USER</span>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">{t('settings.userStandardAccess')}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">{t('settings.usersWithCustomPermissions')}</h4>
-                  {users.filter(u => u.permissions && u.permissions.length > 0).length === 0 ? (
-                    <p className="text-sm text-gray-500">{t('settings.noCustomPermissions')}</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {users
-                        .filter(u => u.permissions && u.permissions.length > 0)
-                        .map((user) => (
-                          <div key={user.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900">{user.name}</span>
-                                <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                                  user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                  user.role === 'MANAGER' ? 'bg-blue-100 text-blue-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {user.role}
-                                </span>
-                              </div>
-                              <span className="text-xs text-gray-500">{user.email}</span>
-                            </div>
-                            <div className="mt-2">
-                              <div className="text-xs font-medium text-gray-700 mb-1">{t('settings.customPermissions')}</div>
-                              <div className="flex flex-wrap gap-1">
-                                {user.permissions?.map((perm) => (
-                                  <span
-                                    key={perm.id}
-                                    className="inline-flex items-center px-2 py-1 text-xs font-medium bg-cyan-100 text-cyan-800 rounded"
-                                  >
-                                    {perm.permission} {perm.resource && `(${perm.resource})`}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <PermissionsTab
+              users={users.map(u => ({
+                id: u.id,
+                name: u.name,
+                email: u.email,
+                role: u.role as UserRoleValue,
+              }))}
+              onUsersReload={fetchUsers}
+            />
           )}
         </div>
       </div>
@@ -1389,7 +1310,7 @@ export default function SettingsPage() {
               </div>
             )}
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               className="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"

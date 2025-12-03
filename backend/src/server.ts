@@ -19,8 +19,24 @@ import uploadRoutes from './routes/upload';
 loadEnv();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+// PORT configuration:
+// - Development (localhost): Default to 5000
+// - Production: Use PORT env var or NODE_PORT, or default to 3000 (MatBao compatible)
+// - MatBao hosting uses 3000 or assigns a port automatically
+const isProduction = process.env.NODE_ENV === 'production';
+const defaultPort = isProduction ? '3000' : '5000';
+const portString = process.env.PORT || process.env.NODE_PORT || defaultPort;
+const PORT = parseInt(portString, 10);
+const FRONTEND_URL = process.env.FRONTEND_URL || (isProduction ? 'https://wam.vuleits.com' : 'http://localhost:3000');
+
+// Validate PORT is a valid number
+if (isNaN(PORT) || PORT <= 0 || PORT > 65535) {
+  console.error('❌ ERROR: PORT environment variable must be a valid port number (1-65535)');
+  console.error(`   Current value: ${portString}`);
+  console.error('   Please set PORT in your .env file or MatBao control panel');
+  console.error('   Example: PORT=3000');
+  process.exit(1);
+}
 
 // Middleware
 app.use(morgan('dev'));
@@ -28,7 +44,9 @@ app.use(morgan('dev'));
 // CORS configuration - Allow multiple origins for development and production
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3001', // Alternative frontend port
   'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001', // Alternative frontend port
   'http://192.168.1.52:3000', // Local network IP
   'https://wam.vuleits.com', // Production frontend
   FRONTEND_URL
@@ -39,9 +57,13 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps, curl, or server-side)
     if (!origin) return callback(null, true);
     
-    // Check if the origin is in the allowed list
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, origin); // Return the specific origin, not just 'true'
+    // Normalize origin (remove trailing slash, convert to lowercase for comparison)
+    const normalizedOrigin = origin.toLowerCase().replace(/\/$/, '');
+    const normalizedAllowedOrigins = allowedOrigins.map(o => o.toLowerCase().replace(/\/$/, ''));
+    
+    // Check if the origin is in the allowed list (case-insensitive)
+    if (normalizedAllowedOrigins.includes(normalizedOrigin)) {
+      callback(null, origin); // Return the original origin for CORS header
     } else {
       console.log(`⚠️  CORS blocked origin: ${origin}`);
       console.log(`   Allowed origins are: ${allowedOrigins.join(', ')}`);
@@ -51,19 +73,27 @@ app.use(cors({
         console.log(`   ✅ Allowing ${origin} in development mode`);
         callback(null, origin);
       } else {
+        console.error(`❌ CORS Error: ${origin} is not in allowed origins list`);
         callback(new Error('Not allowed by CORS'));
       }
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  maxAge: 86400, // 24 hours
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Handle favicon requests - return 204 No Content to prevent redirects
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
 
 // Health check
 app.get('/health', (req, res) => {
@@ -88,6 +118,16 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // Handle CORS errors specifically
+  if (err.message === 'Not allowed by CORS') {
+    console.error(`❌ CORS Error: Request from ${req.get('origin') || 'unknown origin'} blocked`);
+    return res.status(403).json({ 
+      error: 'CORS policy: Origin not allowed',
+      origin: req.get('origin'),
+      allowedOrigins: allowedOrigins
+    });
+  }
+  
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -96,6 +136,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 app.listen(PORT, () => {
   console.log(`🚀 Backend server running on http://localhost:${PORT}`);
   console.log(`📝 Frontend URL: ${FRONTEND_URL}`);
+  console.log(`🌐 Allowed CORS origins: ${allowedOrigins.join(', ')}`);
+  console.log(`✅ Server ready to accept connections`);
 });
 
 export default app;

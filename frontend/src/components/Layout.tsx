@@ -26,7 +26,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { apiFetch, getUploadUrl } from '../lib/api-client';
 import { useCurrentUser } from '../hooks/useCurrentUser';
-import { FEATURES } from '../lib/authorization';
+import { FEATURES, FEATURE_DEFINITIONS, type FeatureKey } from '../lib/authorization';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -47,6 +47,13 @@ export default function Layout({ children }: LayoutProps) {
   const [companySettings, setCompanySettings] = useState<CompanySettings>({});
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [featureEnabled, setFeatureEnabled] = useState<Record<FeatureKey, boolean>>(() => {
+    const enabled: Record<FeatureKey, boolean> = {} as Record<FeatureKey, boolean>;
+    FEATURE_DEFINITIONS.forEach(f => {
+      enabled[f.key] = true; // Default: all features enabled
+    });
+    return enabled;
+  });
 
   const renderSocialIcon = useCallback((link: SocialLink) => {
     const iconKey = (link.icon || link.platform || '').toLowerCase();
@@ -99,12 +106,6 @@ export default function Layout({ children }: LayoutProps) {
         icon: IconDocument,
         feature: FEATURES.AUDIT_LOGS,
       },
-      {
-        name: t('navigation.permissions'),
-        href: '/permissions',
-        icon: IconShield,
-        feature: FEATURES.PERMISSIONS,
-      },
       { 
         name: t('navigation.settings'), 
         href: '/settings', 
@@ -129,12 +130,17 @@ export default function Layout({ children }: LayoutProps) {
             key => FEATURES[key as keyof typeof FEATURES] === item.feature
           ) as keyof typeof FEATURES | undefined;
           if (featureKey) {
+            // Check if feature is enabled AND user has permission
+            const featureKeyValue = item.feature as FeatureKey;
+            if (!featureEnabled[featureKeyValue]) {
+              return false; // Feature is disabled
+            }
             return hasPermission('READ', featureKey);
           }
         }
         return true;
       }),
-    [navigation, user?.role, hasPermission],
+    [navigation, user?.role, hasPermission, featureEnabled],
   );
 
   const isActive = useCallback((path: string) => {
@@ -176,6 +182,14 @@ export default function Layout({ children }: LayoutProps) {
           } else {
             setSocialLinks([]);
           }
+
+          // Load feature enabled state
+          const enabled: Record<FeatureKey, boolean> = {} as Record<FeatureKey, boolean>;
+          FEATURE_DEFINITIONS.forEach(f => {
+            const key = `feature_${f.key}_enabled`;
+            enabled[f.key] = data[key] !== 'false'; // Default to enabled if not set
+          });
+          setFeatureEnabled(enabled);
         }
       } catch {
         // Ignore errors
@@ -513,20 +527,20 @@ export default function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="pt-16 px-4 py-6 lg:px-6 pb-24 mt-[50px]">
+        <main className="pt-16 px-4 py-6 lg:px-6 pb-6 md:pb-24 mt-[50px]">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
 
         {/* Footer */}
-        <footer className={`fixed bottom-0 right-0 left-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700 z-20 transition-all duration-300 ${
+        <footer className={`hidden md:block fixed bottom-0 right-0 left-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700 z-20 transition-all duration-300 ${
           sidebarCollapsed ? 'lg:left-20' : 'lg:left-64'
         }`}>
           <div className="px-4 py-4">
             <div className="max-w-7xl mx-auto">
               <div className="flex flex-col gap-6">
                 {/* Top Row: Company Name, Copyright, and Company Info */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex flex-wrap items-center gap-4 text-sm justify-center md:justify-start">
+                <div className="flex flex-col xxl:flex-row items-start xxl:items-center xxl:justify-between gap-4">
+                  <div className="flex flex-wrap items-start md:items-center gap-2 md:gap-4 text-sm">
                     {companySettings.companyName && (
                       <span className="text-slate-400 text-xs font-zcool">
                         {companySettings.companyName}
@@ -545,14 +559,13 @@ export default function Layout({ children }: LayoutProps) {
                       </a>
                     </span>
                   </div>
-                  <div className="hidden md:flex flex-wrap items-center gap-4 text-sm justify-end w-full md:w-auto">
+                  <div className="flex flex-wrap items-start md:items-center gap-2 md:gap-4 text-sm w-full xxl:w-auto">
                     {companySettings.address && (
                       <>
                         <span className="hidden md:inline text-slate-400">|</span>
                         <span className="flex items-center gap-1.5 text-slate-400 text-xs font-zcool">
-                          <IconMapPin className="h-4 w-4" />
-                          <span>{t('footer.address')}: </span>
-                          <span>{companySettings.address}</span>
+                          <IconMapPin className="h-4 w-4 flex-shrink-0" />
+                          <span className="break-words">{t('footer.address')}: {companySettings.address}</span>
                         </span>
                       </>
                     )}
@@ -563,7 +576,7 @@ export default function Layout({ children }: LayoutProps) {
                           href={`mailto:${companySettings.email}`}
                           className="flex items-center gap-1.5 text-slate-400 hover:text-cyan-400 transition-colors text-xs"
                         >
-                          <IconMail className="h-4 w-4" />
+                          <IconMail className="h-4 w-4 flex-shrink-0" />
                           <span>{companySettings.email}</span>
                         </a>
                       </>
@@ -575,7 +588,7 @@ export default function Layout({ children }: LayoutProps) {
                           href={`tel:${companySettings.phone}`}
                           className="flex items-center gap-1.5 text-slate-400 hover:text-cyan-400 transition-colors text-xs"
                         >
-                          <IconPhone className="h-4 w-4" />
+                          <IconPhone className="h-4 w-4 flex-shrink-0" />
                           <span>{companySettings.phone}</span>
                         </a>
                       </>
@@ -587,7 +600,7 @@ export default function Layout({ children }: LayoutProps) {
                           href={`tel:${companySettings.mobile}`}
                           className="flex items-center gap-1.5 text-slate-400 hover:text-cyan-400 transition-colors text-xs"
                         >
-                          <IconPhone className="h-4 w-4" />
+                          <IconPhone className="h-4 w-4 flex-shrink-0" />
                           <span>{companySettings.mobile}</span>
                         </a>
                       </>

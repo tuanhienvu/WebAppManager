@@ -59,3 +59,9 @@ temp/
 *.tar
 *.tar.gz
 *.rar
+
+# Keep local deployment documentation (not pushed to GitHub)
+AUTHENTICATION-SETUP.md
+DEPLOYMENT-CHECKLIST.md
+MATBAO-DEPLOYMENT.md
+QUICK-DEPLOY.md

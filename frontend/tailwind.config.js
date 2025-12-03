@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xxl': '1400px',
+      },
       colors: {
         notus: {
           blue: {

@@ -326,14 +326,14 @@ export default function TokensPage() {
     <Layout>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">{t('tokens.title')}</h2>
               <p className="text-sm text-gray-500 mt-1">{t('tokens.subtitle')}</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleExportTokens}
                 disabled={selectedTokenIds.length === 0}
               >
@@ -341,14 +341,14 @@ export default function TokensPage() {
                 {t('tokens.exportSelected')}
               </button>
               <button
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
+                className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
                 onClick={() => setShowValidateModal(true)}
               >
                 {t('tokens.validateToken')}
               </button>
               {canCreateTokens && (
                 <button
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40"
                   onClick={() => {
                     resetForm();
                     setShowModal(true);
@@ -378,7 +378,7 @@ export default function TokensPage() {
           />
         )}
 
-        <div className="block w-full overflow-x-auto p-6">
+        <div className="block w-full table-scroll-container p-6">
           <div className="flex gap-2 mb-4 border-b border-gray-200">
             <button
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 0 ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
@@ -408,8 +408,9 @@ export default function TokensPage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <table className="w-full">
+            <div className="table-scroll-container">
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden min-w-full">
+                <table className="w-full min-w-max">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-3 text-center">
@@ -424,13 +425,13 @@ export default function TokensPage() {
                         aria-label="Select all tokens"
                       />
                     </th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('tokens.token')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('tokens.software')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('tokens.version')}</th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('tokens.status')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('tokens.permissions')}</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('tokens.expiresAt')}</th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -454,24 +455,6 @@ export default function TokensPage() {
                             aria-label={`Select token ${item.token}`}
                           />
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="font-mono text-xs text-gray-700">{item.token.substring(0, 16)}...</span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{item.software?.name || '-'}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{item.version?.version || '-'}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-center">
-                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                            item.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                            item.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
-                            'bg-orange-100 text-orange-800'
-                          }`}>
-                            {item.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          <span className="truncate">{item.permissions.join(', ') || '-'}</span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{formatUTCDate(item.expiresAt)}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-center">
                           <div className="flex items-center justify-center gap-2">
                             {canUpdateTokens && (
@@ -497,11 +480,30 @@ export default function TokensPage() {
                             )}
                           </div>
                         </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className="font-mono text-xs text-gray-700">{item.token.substring(0, 16)}...</span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{item.software?.name || '-'}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{item.version?.version || '-'}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-center">
+                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                            item.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                            item.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
+                            'bg-orange-100 text-orange-800'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          <span className="truncate">{item.permissions.join(', ') || '-'}</span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{formatUTCDate(item.expiresAt)}</td>
                       </tr>
                     ))
                   )}
                 </tbody>
-              </table>
+                </table>
+              </div>
             </div>
           )}
         </div>
@@ -633,7 +635,7 @@ export default function TokensPage() {
               placeholder={t('tokens.enterOwner')}
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               className="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -699,7 +701,7 @@ export default function TokensPage() {
               )}
             </div>
           )}
-          <div className="flex justify-end pt-2 border-t border-gray-200">
+          <div className="flex flex-wrap justify-end gap-3 pt-2 border-t border-gray-200">
             <button
               type="button"
               className="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"

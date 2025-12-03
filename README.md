@@ -6,9 +6,15 @@ A full-stack web application for managing software versions, access tokens, and 
 
 This is a **split frontend/backend** application:
 
-- **Backend:** Express.js REST API (Port 5000)
+- **Backend:** Express.js REST API
+  - Local Development: Port 5000
+  - Production: Port 3000 (MatBao hosting)
 - **Frontend:** Next.js React Application (Port 3000)
-- **Database:** SQLite (Development) / MySQL (Production)
+- **Database:** MySQL (Remote hosting database with fallback support)
+
+**Production URLs:**
+- Frontend: https://wam.vuleits.com
+- Backend: https://wamapi.vuleits.com
 
 ```
 webapp-manager/
@@ -86,7 +92,7 @@ npm run clean            # Clean all build artifacts
 ### Backend
 - **Runtime:** Node.js 20+
 - **Framework:** Express.js
-- **Database:** Prisma ORM (SQLite/MySQL)
+- **Database:** Prisma ORM (MySQL)
 - **Auth:** bcryptjs, cookie-based sessions
 - **Language:** TypeScript
 
@@ -130,31 +136,82 @@ frontend/
 
 ## 🔧 Configuration
 
+### Database Configuration
+
+The backend supports primary and fallback database connections:
+
+**Primary Database (DB_* variables):**
+```env
+DB_HOST=172.236.137.93
+DB_PORT=3306
+DB_NAME=vul19326_wam
+DB_USER=vul19326_wamadmin
+DB_PASSWORD=Wamdmin@2025
+```
+
+**Fallback Database (DB2_* variables - optional):**
+```env
+DB2_HOST=172.236.137.94
+DB2_PORT=3306
+DB2_NAME=vul19326_wam_backup
+DB2_USER=vul19326_wamadmin
+DB2_PASSWORD=Wamdmin@2025
+```
+
+The system automatically constructs `DATABASE_URL` from `DB_*` variables. If primary connection fails, it will automatically try the fallback (`DB2_*`).
+
+### Port Configuration
+
+- **Local Development:**
+  - Backend: Port 5000 (default)
+  - Frontend: Port 3000 (default)
+- **Production:**
+  - Backend: Port 3000 (MatBao hosting)
+  - Frontend: Port 3000 or static export
 
 ## 🚀 Deployment
 
-### Backend Deployment
+See detailed deployment guides:
+- **MatBao Hosting:** See [MATBAO-DEPLOYMENT.md](./MATBAO-DEPLOYMENT.md)
+- **Quick Checklist:** See [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md)
+
+### Quick Deployment
+
+**Backend:**
 ```bash
 cd backend
 npm run build
-npm start
+# Upload dist/, prisma/, package.json to wamapi.vuleits.com
+# Configure .env with production variables
 ```
 
-Deploy to: Heroku, AWS, DigitalOcean, Railway, Render
-
-### Frontend Deployment
+**Frontend:**
 ```bash
 cd frontend
-npm run build
-npm start
+npm run build:export
+# Upload out/ folder to wam.vuleits.com web root
 ```
 
-Deploy to: Vercel, Netlify, AWS Amplify
-
 ### Environment Variables
-Remember to set production environment variables:
-- Backend: `DATABASE_URL`, `FRONTEND_URL`
-- Frontend: `NEXT_PUBLIC_API_BASE_URL`
+
+**Backend (.env):**
+```env
+NODE_ENV=production
+PORT=3000
+FRONTEND_URL=https://wam.vuleits.com
+DB_HOST=172.236.137.93
+DB_PORT=3306
+DB_NAME=vul19326_wam
+DB_USER=vul19326_wamadmin
+DB_PASSWORD=Wamdmin@2025
+SESSION_SECRET=your-secret-key
+```
+
+**Frontend (.env.production):**
+```env
+NEXT_PUBLIC_API_BASE_URL=https://wamapi.vuleits.com
+NODE_ENV=production
+```
 
 
 ## 🗄️ Database Management
